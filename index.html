@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAOR raider</title>
+    <style>
+        :root {
+            --bg-color: #36393f;
+            --card-bg: #2f3136;
+            --text-color: #dcddde;
+            --accent: #5865f2;
+            --accent-hover: #4752c4;
+            --border: #202225;
+            --input-bg: #202225;
+            --success: #3ba55c;
+            --error: #ed4245;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin: 0;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #8e9297;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #b9bbbe;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="number"], textarea, select {
+            background-color: var(--input-bg);
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        textarea { resize: vertical; }
+
+        .flex-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .flex-item { flex: 1; }
+
+       
+        .option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .option-item:last-child { border-bottom: none; }
+
+        .option-label-desc {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .option-desc {
+            font-size: 12px;
+            color: #8e9297;
+            display: block;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #72767d;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+       
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-primary:disabled { background-color: #4f545c; cursor: not-allowed; }
+
+        
+        .log-container {
+            background-color: #000;
+            color: #adff2f;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 4px;
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid var(--border);
+        }
+
+        .log-entry { margin-bottom: 4px; }
+        .log-success { color: var(--success); }
+        .log-error { color: var(--error); }
+        .log-time { color: #8e9297; margin-right: 5px; }
+
+       
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>UAOR <span>raider</span></h1>
+    </header>
+
+    <div class="main-grid">
+        <div class="left-col">
+            <div class="card">
+                <div class="card-header">1. 認証と対象</div>
+                <label for="tokens">トークンリスト (改行区切り)</label>
+                <textarea id="tokens" rows="6" placeholder="トークンを入力..."></textarea>
+                
+                <label for="channelId">チャンネル ID</label>
+                <input type="text" id="channelId" placeholder="送信先チャンネルのID">
+            </div>
+
+            <div class="card">
+                <div class="card-header">2. メッセージ内容</div>
+                <label for="messageContent">本文</label>
+                <textarea id="messageContent" rows="5" placeholder="送信するメッセージ..."></textarea>
+                
+                <div class="flex-row">
+                    <div class="flex-item">
+                        <label for="msgCount">連投回数</label>
+                        <input type="number" id="msgCount" value="1" min="1">
+                    </div>
+                    <div class="flex-item">
+                        <label for="msgDelay">遅延 (ミリ秒)</label>
+                        <input type="number" id="msgDelay" value="1000" min="100" step="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="card">
+                <div class="card-header">3. 高度な難読化設定 (AutoMod対策)</div>
+                
+                <div class="option-item">
+                    <div class="option-label-desc">
+                        ゼロ幅文字のランダム混入
+                        <span class="option-desc">文中の文字間に不可視文字を挿入</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="obf_zwc">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="option-item">
+                    <div class="option-label-desc">
+                        不可視特殊文字のランダム挿入
+                        <span class="option-desc">表示されない制御文字を混入</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="obf_inv">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="option-item">
+                    <div class="option-label-desc">
+                        文末ランダム文字挿入 (日本語)
+                        <span class="option-desc">文末にひらがな+漢字を数文字追加</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="obf_jp">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">4. 実行</div>
+                <button id="startBtn" class="btn-primary" onclick="startSending()">送信開始</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">ログ</div>
+                <div id="log" class="log-container">
+                    <div class="log-entry">ステータス:おけ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        サーバーへの参加をお願いします！<br>
+        <a href="https://discord.gg/Tr4ebXaCep" target="_blank">https://discord.gg/Tr4ebXaCep</a>
+    </footer>
+</div>
+
+<script>
+    // ★ デプロイしたCloudflare WorkerのURLに変更してください ★
+    const WORKER_URL = 'https://your-worker-name.your-subdomain.workers.dev/';
+
+    
+
+    
+    const ZWC_CHARS = ['\u200B', '\u200C', '\u200D', '\u2060', '\uFEFF'];
+    
+    const INV_CHARS = ['\u200E', '\u200F', '\u2061', '\u2062', '\u2063'];
+
+    
+    function generateRandomJp(length) {
+        let result = '';
+        const ranges = [
+            [0x3040, 0x309F], 
+            [0x4E00, 0x9FAF]  
+        ];
+        for (let i = 0; i < length; i++) {
+            const range = ranges[Math.floor(Math.random() * ranges.length)];
+            const codePoint = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+            result += String.fromCodePoint(codePoint);
+        }
+        return result;
+    }
+
+    
+    function injectRandomly(text, charArray, probability = 0.3) {
+        return text.split('').map(char => {
+            if (Math.random() < probability) {
+                const randomChar = charArray[Math.floor(Math.random() * charArray.length)];
+                return char + randomChar;
+            }
+            return char;
+        }).join('');
+    }
+
+    
+    function obfuscateMessage(originalContent) {
+        let content = originalContent;
+
+        
+        const useZwc = document.getElementById('obf_zwc').checked;
+        const useInv = document.getElementById('obf_inv').checked;
+        const useJp = document.getElementById('obf_jp').checked;
+
+        
+        if (useJp) {
+            content += ' ' + generateRandomJp(5); 
+        }
+
+        
+        if (useInv) {
+            content = injectRandomly(content, INV_CHARS, 0.2); // 20%の確率で混入
+        }
+
+        
+        if (useZwc) {
+            content = injectRandomly(content, ZWC_CHARS, 0.3); // 30%の確率で混入
+        }
+
+        return content;
+    }
+
+    
+
+    function log(msg, type = '') {
+        const logBox = document.getElementById('log');
+        const time = new Date().toLocaleTimeString();
+        let className = 'log-entry';
+        if (type === 'success') className += ' log-success';
+        if (type === 'error') className += ' log-error';
+
+        logBox.innerHTML += `<div class="${className}"><span class="log-time">[${time}]</span>${msg}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    async function startSending() {
+        const tokenInput = document.getElementById('tokens').value;
+        const tokens = tokenInput.split('\n').map(t => t.trim()).filter(t => t);
+        const channelId = document.getElementById('channelId').value;
+        const originalContent = document.getElementById('messageContent').value;
+        const count = parseInt(document.getElementById('msgCount').value) || 1;
+        const delay = parseInt(document.getElementById('msgDelay').value) || 1000;
+        const startBtn = document.getElementById('startBtn');
+
+        // バリデーション
+        if (tokens.length === 0) return log("エラー: トークンを入力してください", "error");
+        if (!channelId) return log("エラー: チャンネルIDを入力してください", "error");
+        if (!originalContent) return log("エラー: メッセージを入力してください", "error");
+
+        startBtn.disabled = true;
+        startBtn.innerText = "送信中...";
+        log(`実行: token ${tokens.length}個, ${count}回送信, 遅延 ${delay}ms`);
+
+        for (let i = 0; i < count; i++) {
+            
+            const token = tokens[i % tokens.length];
+            const partialToken = token.substring(0, 10) + "...";
+
+            
+            const obfuscatedContent = obfuscateMessage(originalContent);
+
+            try {
+                log(`[${i+1}/${count}] token ${partialToken} で送信...`);
+
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        tokens: [token], 
+                        channelId, 
+                        content: obfuscatedContent 
+                    })
+                });
+
+                const resData = await response.json();
+                
+                if (response.ok) {
+                    log(`成功 [${i+1}/${count}]`, "success");
+                } else {
+                    log(`エラー [${i+1}/${count}]: ステータス ${response.status} - ${resData.message || '不明'}` , "error");
+                }
+            } catch (e) {
+                log(`通信エラー [${i+1}/${count}]: ${e.message}`, "error");
+            }
+
+            
+            if (i < count - 1) {
+                await new Promise(r => setTimeout(r, delay));
+            }
+        }
+
+        log(`完了しました`);
+        startBtn.disabled = false;
+        startBtn.innerText = "送信開始";
+    }
+</script>
+
+</body>
+</html>
